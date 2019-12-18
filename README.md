@@ -1,5 +1,5 @@
 # words
-
+A simple word display app for learning to read.
 ## Project setup
 ```
 npm install
