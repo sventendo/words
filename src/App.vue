@@ -1,68 +1,72 @@
 <template>
     <div id="app" class="flex flex-col min-h-screen">
         <header class="m-2">
-            <navigation @prev="prevWord" @next="nextWord" @configuration="toggleConfiguration"/>
+            <navigation @prev="prev" @next="next" @configuration="configurationModalActive = true"/>
         </header>
-        <main class="flex-grow text-center" :class="fontSize">
-            <div class="mt-32">
-                <span class="font-word" :class="{uppercase: uppercase}">{{ word }}</span>
-            </div>
+        <main class="flex-grow text-center">
+            <component
+                    :is="currentComponent"
+                    :level="level"
+                    ref="component"
+            />
         </main>
         <footer class="m-2">
             <div class="flex justify-center">
-                <div @click="uppercase = !uppercase" class="w-2/3 bg-blue-500 text-center rounded-full p-8">a/A</div>
+                <div @click="toggle" class="w-2/3 bg-blue-500 text-center rounded-full p-8">a/A</div>
             </div>
         </footer>
+        <modal
+                title="Übungen"
+                :active="configurationModalActive"
+                @close="configurationModalActive = false"
+        >
+            <ul>
+                <li class="mt-2" @click="loadComponent('Words')">Lesen</li>
+                <li class="mt-8" @click="loadComponent('Addition', 1)">Rechnen 1</li>
+                <li class="mt-2" @click="loadComponent('Addition', 2)">Rechnen 2</li>
+                <li class="mt-2" @click="loadComponent('Addition', 3)">Rechnen 3</li>
+                <li class="mt-2" @click="loadComponent('Addition', 4)">Rechnen 4</li>
+                <li class="mt-2" @click="loadComponent('Addition', 5)">Rechnen 5</li>
+            </ul>
+        </modal>
     </div>
 </template>
 
 <script>
-    import Navigation from './components/Navigation';
+    import Addition from './components/addition';
+    import Navigation from './components/navigation';
+    import Modal from './components/modal';
+    import Words from './components/words';
 
     export default {
         name: 'app',
         components: {
+            Addition,
             Navigation,
+            Modal,
+            Words,
         },
         data () {
             return {
-                words: [
-                    'Hallo',
-                    'Alma',
-                ],
-                wordIndex: 0,
-                uppercase: true,
+                currentComponent: Words,
+                configurationModalActive: false,
+                level: 1,
             };
         },
-        computed: {
-            word () {
-                return this.words[ this.wordIndex ];
-            },
-            fontSize () {
-                if (this.word.length < 8) {
-                    return 'text-6xl';
-                } else if (this.word.length < 10) {
-                    return 'text-5xl';
-                } else if (this.word.length < 12) {
-                    return 'text-4xl';
-                } else if (this.word.length < 15) {
-                    return 'text-3xl';
-                } else if (this.word.length < 20) {
-                    return 'text-2xl';
-                } else {
-                    return 'text-xl';
-                }
-            },
-        },
         methods: {
-            prevWord () {
-                this.wordIndex = (this.wordIndex - 1 + this.words.length) % this.words.length;
+            prev () {
+                this.$refs.component.prev();
             },
-            nextWord () {
-                this.wordIndex = (this.wordIndex + 1) % this.words.length;
+            next () {
+                this.$refs.component.next();
             },
-            toggleConfiguration () {
-
+            toggle () {
+                this.$refs.component.toggle();
+            },
+            loadComponent (component, level) {
+                this.currentComponent = component;
+                this.level = level;
+                this.configurationModalActive = false;
             },
         },
     };
